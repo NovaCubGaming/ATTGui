@@ -1,3 +1,13 @@
+/*---
+compatibilityVersion: naiscript-1.0
+id: b3b287e5-af9c-4874-a88d-27f3dec9e8d8
+name: ATTG UI
+createdAt: 1775059445606
+updatedAt: 1775082393127
+version: 2.0.6
+author: Spudz Pasta
+memoryLimit: 8
+---*/
 // ======================================================
 //  SCRIPT PANEL — ATTG WITH RANDOMIZER
 // ======================================================
