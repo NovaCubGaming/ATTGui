@@ -1,0 +1,254 @@
+/*---
+compatibilityVersion: naiscript-1.0
+id: b3b287e5-af9c-4874-a88d-27f3dec9e8d8
+name: ATTG UI
+createdAt: 1775059445606
+updatedAt: 1775068911602
+version: 1.7.4
+author: Spudz Pasta
+memoryLimit: 8
+---*/
+// ====================================================== 
+//  SCRIPT PANEL — ATTG WITH RANDOMIZER
+// ====================================================== 
+
+let authorInput = "";
+let titleInput = "";
+let tagsInput = "";
+let genreInput = "";
+let sValueInput = "4";
+let styleInput = "";
+
+// Randomizer pools
+const RANDOM_AUTHORS = [
+    "Elara Ozonium", "Brian Lumley", "Vera Straylight",
+    "Someone uniquely him", "A homeless guy", "Mira Kess"
+];
+
+const RANDOM_TITLES = [
+    "The Soonening", "Ashfall Meridian", "No, It never was",
+    "Starless Vector", "The Last Quiet Orbit", "Hollow Sun, Burning Sky",
+    "But how many are left?"
+];
+
+const RANDOM_TAGS = [
+    "epic, grand, fluffy, sfw",
+    "grimdark, cosmic, hard science",
+    "romantic, soft, character-driven",
+    "mystical, surreal, dreamlike",
+    "action-heavy, pulpy, fast-paced",
+    "epic, sweeping, mythic",
+    "grand, operatic, world-shaking",
+    "heroic, legendary, fate-driven",
+    "cosmic, vast, awe-filled",
+    "high stakes, destiny-bound, monumental",
+    "grimdark, brutal, unforgiving",
+    "gritty, grounded, bleak",
+    "harsh, violent, morally gray",
+    "cosmic horror, existential dread",
+    "decay, entropy, ruin",
+    "surreal, dreamlike, uncanny",
+    "weirdcore, liminal, off-kilter",
+    "psychedelic, kaleidoscopic, bizarre",
+    "metafictional, self-aware, experimental",
+    "absurdist, chaotic, unpredictable",
+    "soft, warm, gentle",
+    "cozy, comforting, slice-of-life",
+    "wholesome, fluffy, heartwarming",
+    "quiet, reflective, peaceful",
+    "domestic, tender, low-stakes",
+    "romantic, yearning, intimate",
+    "slow-burn, emotional, character-driven",
+    "passionate, dramatic, tangled",
+    "bittersweet, tender, vulnerable",
+    "messy, human, heartfelt",
+    "mystical, arcane, enchanted",
+    "ritualistic, symbolic, mythic",
+    "folkloric, ancient, uncanny",
+    "ethereal, luminous, otherworldly",
+    "occult, esoteric, forbidden"
+];
+
+const RANDOM_GENRES = [
+    "scifi, space opera",
+    "fantasy, mythic",
+    "horror, cosmic",
+    "romance, slice of life",
+    "thriller, techno",
+    "cyberpunk, post-cyberpunk",
+    "biopunk, genepunk",
+    "solarpunk, lunarpunk",
+    "post-apocalyptic, wasteland",
+    "first contact, alien cultures",
+    "time travel, paradox fiction",
+    "high fantasy, mythic",
+    "low fantasy, grounded",
+    "urban fantasy, modern magic",
+    "dark fantasy, occult",
+    "fairytale, folkloric",
+    "sword and sorcery",
+    "portal fantasy, isekai",
+    "cosmic horror, unknowable",
+    "psychological horror",
+    "body horror, grotesque",
+    "supernatural horror",
+    "folk horror, ritualistic",
+    "techno-horror, AI dread"
+];
+
+const RANDOM_SVALUES = ["2", "3", "4", "5"];
+
+api.v1.ui.register([
+    {
+        type: "scriptPanel",
+        name: "ATTG stuff",
+        content: [
+            { type: "text", text: "Tell me your story, boss:" },
+
+            // ---- Author ----
+            {
+                type: "textInput",
+                label: "Author",
+                placeholder: "e.g., Elara Ozonium",
+                onChange: (value) => { authorInput = value.trim(); }
+            },
+
+            // ---- Title ----
+            {
+                type: "textInput",
+                label: "Title",
+                placeholder: "e.g., The Soonening",
+                onChange: (value) => { titleInput = value.trim(); }
+            },
+
+            // ---- Tags ----
+            {
+                type: "textInput",
+                label: "Tags (comma-separated)",
+                placeholder: "e.g., epic, grand, fluffy, sfw",
+                onChange: (value) => { tagsInput = value.trim(); }
+            },
+
+            // ---- Genre ----
+            {
+                type: "textInput",
+                label: "Genre (comma-separated)",
+                placeholder: "e.g., scifi, space opera",
+                onChange: (value) => { genreInput = value.trim(); }
+            },
+
+            // ---- S-Value ----
+            {
+                type: "textInput",
+                label: "S-Value",
+                placeholder: "Default: 4",
+                onChange: (value) => { sValueInput = value.trim() || "4"; }
+            },
+
+            // ---- Manual Style Input ----
+            {
+                type: "textInput",
+                label: "Style (optional), not recommended here.",
+                placeholder: "e.g., vivid, detailed",
+            },
+
+            //- Buttons
+            {
+                type: "button",
+                text: "Set ATTG",
+                callback: async () => {
+
+                    let block =
+                        `[ Author: ${authorInput}; ` +
+                        `Title: ${titleInput}; ` +
+                        `Tags: ${tagsInput}; ` +
+                        `Genre: ${genreInput} ][ S: ${sValueInput} ]`;
+
+                    if (styleInput !== "") {
+                        block += `\n[ Style: ${styleInput} ]`;
+                    }
+
+                    await api.v1.memory.set(block);
+
+                    api.v1.log("Hooked you up:");
+                    api.v1.log(block);
+                }
+            },
+            {
+                type: "button",
+                text: "Just THROW me",
+                callback: async () => {
+                    authorInput = RANDOM_AUTHORS[Math.floor(Math.random() * RANDOM_AUTHORS.length)];
+                    titleInput = RANDOM_TITLES[Math.floor(Math.random() * RANDOM_TITLES.length)];
+                    tagsInput = RANDOM_TAGS[Math.floor(Math.random() * RANDOM_TAGS.length)];
+                    genreInput = RANDOM_GENRES[Math.floor(Math.random() * RANDOM_GENRES.length)];
+                    sValueInput = RANDOM_SVALUES[Math.floor(Math.random() * RANDOM_SVALUES.length)];
+
+                    api.v1.log("Here's an adventure, boss:");
+                    api.v1.log(`${authorInput}, ${titleInput}, ${tagsInput}, ${genreInput}, S=${sValueInput}, Style=${styleInput}`);
+                }
+            },
+                // ---- Save Settings ----
+                {
+                    type: "button",
+                    text: "Save Settings",
+                    callback: async () => {
+                        const settings = {
+                            authorInput,
+                            titleInput,
+                            tagsInput,
+                            genreInput,
+                            sValueInput,
+                            styleInput
+                        };
+
+                        await api.v1.storage.set("attg-settings", settings);
+                        api.v1.log("Settings saved.");
+                    }
+                },
+
+                // ---- Load Settings ----
+                {
+                    type: "button",
+                    text: "Load Settings",
+                    callback: async () => {
+                        const settings = await api.v1.storage.get("attg-settings");
+
+                        if (!settings) {
+                            api.v1.log("No saved settings found.");
+                            return;
+                        }
+
+                        authorInput = settings.authorInput || "";
+                        titleInput = settings.titleInput || "";
+                        tagsInput = settings.tagsInput || "";
+                        genreInput = settings.genreInput || "";
+sValueInput = settings.sValueInput || "4";
+                        styleInput = settings.styleInput || "";
+
+                        api.v1.log("Settings loaded.");
+                    }
+                },
+
+                // ---- Export Settings ----
+                {
+                    type: "button",
+                    text: "Export Settings",
+                    callback: async () => {
+                        const settings = {
+                            authorInput,
+                            titleInput,
+                            tagsInput,
+                            genreInput,
+                            sValueInput,
+                            styleInput
+                        };
+
+                        const json = JSON.stringify(settings, null, 2);
+                        api.v1.log("Exported Settings:\n" + json);
+                    }
+                },
+
+        ]
+    }
+]);
