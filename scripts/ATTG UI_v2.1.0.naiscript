@@ -151,7 +151,7 @@ api.v1.ui.register([
             {
                 type: "textInput",
                 label: "S-Value",
-                placeholder: "Default: 4, this repesents the 'star rating' for writing quality, I think.",
+                placeholder: "Default: 4, this repesents the 'star rating' for writing quality, 1-5 stars.",
                 onChange: (value) => { sValueInput = value.trim() || "4"; }
             },
 
