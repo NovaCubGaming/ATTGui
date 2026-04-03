@@ -36,7 +36,7 @@ const RANDOM_AUTHORS = [
 ];
 
 const RANDOM_TITLES = [
-    "The Soonening", "ght901 didn't come up with this", "No, It never was",
+    "The Soonening", "Daryl didn't come up with this", "No, It never was",
     "God left yesterday", "The Last Quiet Orbit", "Hollow Shell, Burning light",
     "But how many are left?", "It wasn't yesterday", "I need a bandaid",
     "That time I reincarnated as my Dad's Cellphone?1", "14 beers deep, 1 night long", "But everyday is tomorrow",
