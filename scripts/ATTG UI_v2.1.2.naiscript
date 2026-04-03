@@ -1,0 +1,286 @@
+/*---
+compatibilityVersion: naiscript-1.0
+id: b3b287e5-af9c-4874-a88d-27f3dec9e8d8
+name: ATTG UI
+createdAt: 1775059445606
+updatedAt: 1775201218313
+version: 2.1.2
+author: Spudz Pasta
+memoryLimit: 8
+---*/
+//-SCRIPT PANEL — ATTG WITH RANDOMIZER-\\
+
+let authorInput = "";
+let titleInput = "";
+let tagsInput = "";
+let genreInput = "";
+let sValueInput = "4";
+let styleInput = "";
+
+//-PERMISSIONS SECTION-\\
+let storyPerms = await api.v1.permissions.request('storyEdit');
+
+if (storyPerms) {
+  api.v1.log('Permission granted!');
+} else {
+  api.v1.log('Permission denied');
+  api.v1.ui.toast('Awaiting your orders, boss.', { type: 'error' });
+}
+
+//- Randomizer pools -\\
+const RANDOM_AUTHORS = [
+    "Elara Ozonium", "Brian Lumley", "Somebody Smart Probably",
+    "Someone uniquely him", "A homeless guy", "Gii Mi Kihses",
+    "A Stray Cat", "It didn't matter anyways", "That guy greg",
+    "The guys from VLDL", "Captain Jehpry", "It wasn't your dad"
+];
+
+const RANDOM_TITLES = [
+    "The Soonening", "ght901 didn't come up with this", "No, It never was",
+    "God left yesterday", "The Last Quiet Orbit", "Hollow Shell, Burning light",
+    "But how many are left?", "It wasn't yesterday", "I need a bandaid",
+    "That time I reincarnated as my Dad's Cellphone?1", "14 beers deep, 1 night long", "But everyday is tomorrow",
+    "Did Greg return my lawn mower?", "500 years go I died, but I guess I'm back now in another world?", "The night I slept on a bench",
+    "Have you ever went in a litter box?", "Someone else farted and blamed me", "Reborn as a Wizard's Sentient Grimoire",
+    "Reborn as the BEST manga-Ka...'s pen?!", "But he still doesn't have my damn money", "I really don't think she cared"
+];
+
+const RANDOM_TAGS = [
+    "epic, grand, fluffy, sfw",
+    "grimdark, cosmic, hard science",
+    "romantic, soft, character-driven",
+    "mystical, surreal, dreamlike",
+    "action-heavy, pulpy, fast-paced",
+    "epic, sweeping, mythic",
+    "grand, operatic, world-shaking",
+    "heroic, legendary, fate-driven",
+    "cosmic, vast, awe-filled",
+    "high stakes, destiny-bound, monumental",
+    "grimdark, brutal, unforgiving",
+    "gritty, grounded, bleak",
+    "harsh, violent, morally gray",
+    "cosmic horror, existential dread",
+    "decay, entropy, ruin",
+    "surreal, dreamlike, uncanny",
+    "weirdcore, liminal, off-kilter",
+    "psychedelic, kaleidoscopic, bizarre",
+    "metafictional, self-aware, experimental",
+    "absurdist, chaotic, unpredictable",
+    "soft, warm, gentle",
+    "cozy, comforting, slice-of-life",
+    "wholesome, fluffy, heartwarming",
+    "quiet, reflective, peaceful",
+    "domestic, tender, low-stakes",
+    "romantic, yearning, intimate",
+    "slow-burn, emotional, character-driven",
+    "passionate, dramatic, tangled",
+    "bittersweet, tender, vulnerable",
+    "messy, human, heartfelt",
+    "mystical, arcane, enchanted",
+    "ritualistic, symbolic, mythic",
+    "folkloric, ancient, uncanny",
+    "ethereal, luminous, otherworldly",
+    "occult, esoteric, forbidden"
+];
+
+const RANDOM_GENRES = [
+    "scifi, space opera",
+    "fantasy, mythic",
+    "horror, cosmic",
+    "romance, slice of life",
+    "thriller, techno",
+    "cyberpunk, post-cyberpunk",
+    "biopunk, genepunk",
+    "solarpunk, lunarpunk",
+    "post-apocalyptic, wasteland",
+    "first contact, alien cultures",
+    "time travel, paradox fiction",
+    "high fantasy, mythic",
+    "low fantasy, grounded",
+    "urban fantasy, modern magic",
+    "dark fantasy, occult",
+    "fairytale, folkloric",
+    "sword and sorcery",
+    "portal fantasy, isekai",
+    "cosmic horror, unknowable",
+    "psychological horror",
+    "body horror, grotesque",
+    "supernatural horror",
+    "folk horror, ritualistic",
+    "techno-horror, AI dread"
+];
+
+const RANDOM_SVALUES = ["2", "3", "4", "5"];
+
+api.v1.ui.register([
+    {
+        type: "scriptPanel",
+        name: "ATTG stuff",
+        content: [
+            { type: "text", text: "Tell me your story, boss:" },
+
+            //- Author -\\
+            {
+                type: "textInput",
+                label: "Author",
+                placeholder: "e.g., Elara Ozonium",
+                onChange: (value) => { authorInput = value.trim(); }
+            },
+
+            //- Title -\\
+            {
+                type: "textInput",
+                label: "Title",
+                placeholder: "e.g., The Soonening",
+                onChange: (value) => { titleInput = value.trim(); }
+            },
+
+            //- Tags -\\
+            {
+                type: "textInput",
+                label: "Tags (comma-separated)",
+                placeholder: "e.g., epic, grand, fluffy, sfw",
+                onChange: (value) => { tagsInput = value.trim(); }
+            },
+
+            //- Genre -\\
+            {
+                type: "textInput",
+                label: "Genre (comma-separated)",
+                placeholder: "e.g., scifi, space opera",
+                onChange: (value) => { genreInput = value.trim(); }
+            },
+
+            //- S value -\\
+            {
+                type: "textInput",
+                label: "S-Value",
+                placeholder: "Default: 2, this is a 'star rating' system.",
+                onChange: (value) => { sValueInput = value.trim() || "2"; }
+            },
+
+            //- Style -\\
+            {
+                type: "textInput",
+                label: "Style (optional), not recommended here.",
+                placeholder: "e.g., vivid, detailed",
+                onChange: (value) => { styleInput = value.trim(); }   // <-- FIXED
+            },
+
+            //- Buttons -\\
+            {
+                type: "button",
+                text: "Set ATTG",
+                callback: async () => {
+
+                    let memBlock = await api.v1.memory.get();
+
+                    //- Regex to find existing ATTG block -\\
+                    const attgRegex = /\[ Author:[\s\S]*?\[ S:[\s\S]*?\](?:\s*\[ Style:[\s\S]*?\])?/m;
+
+                    let newBlock =
+                      `[ Author: ${authorInput}; ` +
+                      `Title: ${titleInput}; ` +
+                      `Tags: ${tagsInput}; ` +
+                      `Genre: ${genreInput} ][ S: ${sValueInput} ]`;
+
+                    if (styleInput !== "") {
+                      newBlock += `\n[ Style: ${styleInput} ]`;
+                    }
+
+                    let updatedMemory;
+
+                    await api.v1.story.title.set(titleInput);
+
+                    //- If ATTG block exists, replace it -\\
+                    if (attgRegex.test(memBlock)) {
+                      updatedMemory = memBlock.replace(attgRegex, newBlock);
+                    } else {
+                      //- Otherwise append it cleanly -\\
+                      updatedMemory = memBlock.trim() + "\n" + newBlock;
+                    }
+
+                    //- Write back the merged memory -\\
+                    await api.v1.memory.set(updatedMemory);
+                }
+            },
+
+            {
+                type: "button",
+                text: "Just THROW me",
+                callback: async () => {
+                    authorInput = RANDOM_AUTHORS[Math.floor(Math.random() * RANDOM_AUTHORS.length)];
+                    titleInput = RANDOM_TITLES[Math.floor(Math.random() * RANDOM_TITLES.length)];
+                    tagsInput = RANDOM_TAGS[Math.floor(Math.random() * RANDOM_TAGS.length)];
+                    genreInput = RANDOM_GENRES[Math.floor(Math.random() * RANDOM_GENRES.length)];
+                    sValueInput = RANDOM_SVALUES[Math.floor(Math.random() * RANDOM_SVALUES.length)];
+
+                    api.v1.log("Here's an adventure, boss:");
+                    api.v1.log(`${authorInput}, ${titleInput}, ${tagsInput}, ${genreInput}, S=${sValueInput}, Style=${styleInput}`);
+                }
+            },
+
+            //- Save settings -\\
+            {
+                type: "button",
+                text: "Save Settings",
+                callback: async () => {
+                    const settings = {
+                        authorInput,
+                        titleInput,
+                        tagsInput,
+                        genreInput,
+                        sValueInput,
+                        styleInput
+                    };
+
+                    await api.v1.storage.set("attg-settings", settings);
+                    api.v1.log("Settings saved.");
+                }
+            },
+
+            //- Load settings -\\
+            {
+                type: "button",
+                text: "Load Settings",
+                callback: async () => {
+                    const settings = await api.v1.storage.get("attg-settings");
+
+                    if (!settings) {
+                        api.v1.log("No saved settings found.");
+                        return;
+                    }
+
+                    authorInput = settings.authorInput || "";
+                    titleInput = settings.titleInput || "";
+                    tagsInput = settings.tagsInput || "";
+                    genreInput = settings.genreInput || "";
+                    sValueInput = settings.sValueInput || "4";
+                    styleInput = settings.styleInput || "";
+
+                    api.v1.log("Settings loaded.");
+                }
+            },
+
+            //- Export settings -\\
+            {
+                type: "button",
+                text: "Export Settings",
+                callback: async () => {
+                    const settings = {
+                        authorInput,
+                        titleInput,
+                        tagsInput,
+                        genreInput,
+                        sValueInput,
+                        styleInput
+                    };
+
+                    const json = JSON.stringify(settings, null, 2);
+                    api.v1.log("Exported Settings:\n" + json);
+                }
+            },
+
+        ]
+    }
+]);
